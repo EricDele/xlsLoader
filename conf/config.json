@@ -1,0 +1,53 @@
+{
+  "topology": {
+    "C": {
+      "property": "arbo",
+      "columnTitle": "Arbo",
+      "default": ""
+    },
+    "D": {
+      "property": "queueName",
+      "columnTitle": "Queues",
+      "default": ""
+    },
+    "E": {
+      "property": "capacity",
+      "columnTitle": "Configured capacity %",
+      "default": "1"
+    },
+    "F": {
+      "property": "maximum-capacity",
+      "columnTitle": "Maximum capacity %",
+      "default": "1"
+    },
+    "I": {
+      "property": "user-limit-factor",
+      "columnTitle": "user-limit-factor",
+      "default": ""
+    },
+    "J": {
+      "property": "acl_administer_jobs",
+      "columnTitle": "Ranger User",
+      "default": ""
+    },
+    "L": {
+      "property": "ordering-policy",
+      "columnTitle": "Ordering Policy",
+      "default": "fifo"
+    },
+    "M": {
+      "property": "state",
+      "columnTitle": "State",
+      "default": "RUNNING"
+    }
+  },
+  "sheet-name": "Queues Elastic Fix",
+  "row-titles": "4",
+  "queues-name-column": "4",
+  "cellule-origine": {
+    "row": "11",
+    "col": "3"
+  },
+  "nb-groupes-arbo": "1",
+  "row-max": "85"
+}
