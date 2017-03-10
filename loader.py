@@ -3,6 +3,7 @@
 
 import json
 from openpyxl import load_workbook
+from collections import defaultdict
 
 class BusinessError(Exception):
     """
@@ -14,14 +15,14 @@ class BusinessError(Exception):
         self.cause = cause
 
 
-class XlsLoader:
+class Loader:
 
     def __init__(self, xls_file, config_file):
         self.xls_file = xls_file
         with open(config_file) as jsonFile:
             self.config_file = json.load(jsonFile)
         self.data_array = []
-        self.data = dict()
+        self.data = defaultdict(dict)
 
     # --------------------------------------------#
     #       Converti la LETTRE en COLONNE NUM     #
@@ -57,6 +58,17 @@ class XlsLoader:
                 elif self.config_file['topology'][column]['default'] != "":
                     # No value, is there a default value for this column ?
                     self.data[str(row)][self.config_file['topology'][column]['property']] = self.config_file['topology'][column]['default']
+            row += 1
+
+    def get_line_numbers(self):
+        return self.data.keys()
+
+    def get_a_line(self,line_number):
+        return self.data[str(line_number)]
+
+    def __iter__(self):
+        for line in sorted(self.data.keys()):
+            yield self.data[line]
 
     def __str__(self):
-        return json.dumps(data, indent=2)
+        return json.dumps(self.data, indent=2)
