@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import csv
 from openpyxl import load_workbook
 from collections import defaultdict
 
@@ -17,11 +18,10 @@ class BusinessError(Exception):
 
 class Loader:
 
-    def __init__(self, xls_file, config_file):
-        self.xls_file = xls_file
+    def __init__(self, config_file):
+        self.xls_file = ""
         with open(config_file) as jsonFile:
             self.config_file = json.load(jsonFile)
-        self.data_array = []
         self.data = defaultdict(dict)
 
     # --------------------------------------------#
@@ -33,12 +33,13 @@ class Loader:
         if(len(lettre) == 1):
             return (ord(lettre.upper()) - ord('A')) + 1
 
-    def load_file(self):
+    def load_file(self, xls_file):
+        self.xls_file = xls_file
         wb = load_workbook(self.xls_file, data_only=True)
         ws = wb.get_sheet_by_name(self.config_file['sheet-name'])
         row = int(self.config_file['cellule-origine']['row'])
         col = int(self.config_file['cellule-origine']['col'])
-        rowMax = int(self.config_file['row-max'])
+        row_max = int(self.config_file['row-max'])
         # Check the column titles if they are same as the configuration
         for column in self.config_file['topology']:
             if ws[column + self.config_file['row-titles']].value != self.config_file['topology'][column]['columnTitle']:
@@ -48,7 +49,7 @@ class Loader:
                     " find : " + ws[column + self.config_file['row-titles']].value + " instead of : " + self.config_file['topology'][column]['columnTitle'],
                     cause=self)
         # parsing file
-        while row != rowMax:
+        while row != row_max:
             for column in sorted(self.config_file['topology']):
                 # Store the cell value
                 cell_value = str(ws.cell(row=row, column=self.lettreVersCol(column)).value)
@@ -59,6 +60,15 @@ class Loader:
                     # No value, is there a default value for this column ?
                     self.data[str(row)][self.config_file['topology'][column]['property']] = self.config_file['topology'][column]['default']
             row += 1
+
+    def write_csv_file(self,csv_file):
+        with open(csv_file, 'wb') as csvfile:
+            csv_writer = csv.writer(csvfile, delimiter=';', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            # Write header
+            csv_writer.writerow([self.config_file['topology'][column]['property'] for column in sorted(self.config_file['topology'])])
+            # Write all the columns
+            for line in sorted(self.data.keys()):
+                csv_writer.writerow([self.data[line][self.config_file['topology'][column]['property']] for column in sorted(self.config_file['topology'])])
 
     def get_line_numbers(self):
         return self.data.keys()
